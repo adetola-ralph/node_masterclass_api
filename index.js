@@ -1,5 +1,4 @@
 // Dependencies
-
 var http = require('http');
 var https = require('https');
 var url = require('url');
@@ -103,6 +102,7 @@ handlers.ping = function (data, callback) {
   callback(200);
 };
 
+// Hello world handler
 handlers.hello = function (data, callback) {
   callback(200, {
     message: 'Hello and welcome',
@@ -117,5 +117,7 @@ handlers.notFound = function (data, callback) {
 // Define a request router
 var router = {
   ping: handlers.ping,
+
+  // hello world route registration
   hello: handlers.hello,
 }
