@@ -35,7 +35,7 @@ httpsServer.listen(config.httpsPort, () => {
 });
 
 // All the server logic for hoth http and https server
-const unifiedServer = function (req, res) {
+const unifiedServer = (req, res) => {
 
   // Get url and parse it
   const parsedUrl = url.parse(req.url, true);
@@ -56,11 +56,11 @@ const unifiedServer = function (req, res) {
   // Get the payload if any
   const decoder = new StringDecoder('utf-8');
   let buffer = '';
-  req.on('data', function (data) {
+  req.on('data', (data) => {
     buffer += decoder.write(data);
   });
 
-  req.on('end', function() {
+  req.on('end', () => {
     buffer += decoder.end();
 
     // chose the handler to handle request, use not found handler 
@@ -77,7 +77,7 @@ const unifiedServer = function (req, res) {
     };
 
     // Route the request to the handler
-    chosenHandler(data, function(statusCode, payload) {
+    chosenHandler(data, (statusCode, payload) => {
       // Use the status code called by the handler or default to 200
       statusCode = typeof(statusCode) == 'number' ? statusCode : 200;
 
@@ -109,7 +109,8 @@ handlers.ping = (data, callback) => {
 
 // Hello world handler
 handlers.hello = (data, callback) => {
-  callback(200, { message: 'Hello and welcome' });
+  const { name } = data.queryStringObject;
+  callback(200, { message: `Hello and Welcome ${name || 'Stranger'}` });
 };
 
 // Not found handler
