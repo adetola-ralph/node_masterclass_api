@@ -1,56 +1,61 @@
 // Dependencies
-var http = require('http');
-var https = require('https');
-var url = require('url');
-var StringDecoder = require('string_decoder').StringDecoder;
-var fs = require('fs');
+const http = require('http');
+const https = require('https');
+const url = require('url');
+const { StringDecoder } = require('string_decoder');
+const fs = require('fs');
 
-var config = require('./config');
+// Get the configuration
+const config = require('./config');
 
-var httpServer = http.createServer(function (req, res) {
+// HTTP server
+const httpServer = http.createServer((req, res) => {
   unifiedServer(req, res);
 });
 
-var httpsServerOptions = {
+// HTTPS server configuration
+const httpsServerOptions = {
   key: fs.readFileSync('./https/key.pem'),
   cert: fs.readFileSync('./https/cert.pem'),
 };
 
-var httpsServer = https.createServer(httpsServerOptions, function (req, res) {
+// HTTPS server
+const httpsServer = https.createServer(httpsServerOptions, (req, res) => {
   unifiedServer(req, res);
 });
 
-// Start the server
-httpServer.listen(config.httpPort, function () {
-  console.log('Http Server listening on ' + config.httpPort);
+// Start the HTTP server
+httpServer.listen(config.httpPort, () => {
+  console.log(`Http Server listening on ${config.httpPort}`);
 });
 
-httpsServer.listen(config.httpsPort, function () {
-  console.log('Https Server listening on ' + config.httpsPort);
+// Start the HTTPS Server
+httpsServer.listen(config.httpsPort, () => {
+  console.log(`Https Server listening on ${config.httpsPort}`);
 });
 
 // All the server logic for hoth http and https server
-var unifiedServer = function (req, res) {
+const unifiedServer = function (req, res) {
 
   // Get url and parse it
-  var parsedUrl = url.parse(req.url, true);
+  const parsedUrl = url.parse(req.url, true);
 
   // Get path from url
-  var path = parsedUrl.pathname;
-  var trimmedPath = path.replace(/^\/+|\/+$/g, '');
+  const path = parsedUrl.pathname;
+  const trimmedPath = path.replace(/^\/+|\/+$/g, '');
 
   // Get query string
-  var queryStringObject = parsedUrl.query;
+  const queryStringObject = parsedUrl.query;
 
   // Get the HTTP method
-  var method = req.method.toLowerCase();
+  const method = req.method.toLowerCase();
 
   // Get the headers as an object
-  var headers = req.headers;
+  const headers = req.headers;
 
   // Get the payload if any
-  var decoder = new StringDecoder('utf-8');
-  var buffer = '';
+  const decoder = new StringDecoder('utf-8');
+  let buffer = '';
   req.on('data', function (data) {
     buffer += decoder.write(data);
   });
@@ -60,14 +65,14 @@ var unifiedServer = function (req, res) {
 
     // chose the handler to handle request, use not found handler 
     // if no appropriate handler is found
-    var chosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
+    const chosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
 
     // COnstruct a data object to send to the handler
-    var data = {
-      trimmedPath: trimmedPath,
-      queryStringObject: queryStringObject,
-      method: method,
-      headers: headers,
+    const data = {
+      trimmedPath,
+      queryStringObject,
+      method,
+      headers,
       payload: buffer,
     };
 
@@ -80,10 +85,10 @@ var unifiedServer = function (req, res) {
       payload = typeof(payload) == 'object' ? payload : {};
 
       // Convert payload to a string
-      var payloadString = JSON.stringify(payload);
+      const payloadString = JSON.stringify(payload);
 
       // Return the response
-      // Always set headers before writing
+      // Always set headers before writing the response
       res.setHeader('Content-type', 'application/json');
       res.writeHead(statusCode);
       res.end(payloadString);
@@ -95,29 +100,28 @@ var unifiedServer = function (req, res) {
 };
 
 // Define handlers
-var handlers = {};
+const handlers = {};
 
-handlers.ping = function (data, callback) {
+handlers.ping = (data, callback) => {
   // Callback a http status code and a payload object
   callback(200);
 };
 
 // Hello world handler
-handlers.hello = function (data, callback) {
-  callback(200, {
-    message: 'Hello and welcome',
-  });
+handlers.hello = (data, callback) => {
+  callback(200, { message: 'Hello and welcome' });
 };
 
 // Not found handler
-handlers.notFound = function (data, callback) {
+handlers.notFound = (data, callback) => {
   callback(404);
 };
 
 // Define a request router
-var router = {
+const router = {
+  // Ping route registration
   ping: handlers.ping,
 
-  // hello world route registration
+  // Hello world route registration
   hello: handlers.hello,
 }
