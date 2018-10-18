@@ -5,11 +5,13 @@ const url = require('url');
 const { StringDecoder } = require('string_decoder');
 const fs = require('fs');
 
+const helpers = require('./lib/helpers');
+
 // Handlers
-const handlers = require('./handlers');
+const handlers = require('./lib/handlers');
 
 // Get the configuration
-const config = require('./config');
+const config = require('./lib/config');
 
 // HTTP server
 const httpServer = http.createServer((req, res) => {
@@ -76,7 +78,7 @@ const unifiedServer = (req, res) => {
       queryStringObject,
       method,
       headers,
-      payload: buffer,
+      payload: helpers.paseJsonToObject(buffer),
     };
 
     // Route the request to the handler
@@ -102,24 +104,7 @@ const unifiedServer = (req, res) => {
   });
 };
 
-// Define handlers
-const handlers = {};
 
-handlers.ping = (data, callback) => {
-  // Callback a http status code and a payload object
-  callback(200);
-};
-
-// Hello world handler
-handlers.hello = (data, callback) => {
-  const { name } = data.queryStringObject;
-  callback(200, { message: `Hello and Welcome ${name || 'Stranger'}` });
-};
-
-// Not found handler
-handlers.notFound = (data, callback) => {
-  callback(404);
-};
 
 // Define a request router
 const router = {
@@ -128,4 +113,5 @@ const router = {
 
   // Hello world route registration
   hello: handlers.hello,
+  users: handlers.users,
 }
