@@ -5,6 +5,9 @@ const url = require('url');
 const { StringDecoder } = require('string_decoder');
 const fs = require('fs');
 
+// Handlers
+const handlers = require('./handlers');
+
 // Get the configuration
 const config = require('./config');
 
