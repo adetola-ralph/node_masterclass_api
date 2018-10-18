@@ -78,7 +78,7 @@ const unifiedServer = (req, res) => {
       queryStringObject,
       method,
       headers,
-      payload: helpers.paseJsonToObject(buffer),
+      payload: helpers.parseJsonToObject(buffer),
     };
 
     // Route the request to the handler
