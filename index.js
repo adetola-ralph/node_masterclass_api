@@ -113,5 +113,10 @@ const router = {
 
   // Hello world route registration
   hello: handlers.hello,
+
+  // User route registration
   users: handlers.users,
+
+  // Token route registration
+  tokens: handlers.tokens,
 }
