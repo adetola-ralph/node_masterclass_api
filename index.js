@@ -119,4 +119,7 @@ const router = {
 
   // Token route registration
   tokens: handlers.tokens,
-}
+
+  // Checks route registration
+  checks: handlers.checks,
+};
